@@ -9,12 +9,12 @@
     <style>:root {
   color-scheme: light dark;
 
-  --color-background: #ffffff;
-  --color-primary: #212529;
-  --color-secondary: #95a5a6;
-  --color-muted: #f4f6f6;
-  --color-accent: #f1c40f;
-  --color-link: #2ecc71;
+  --color-background: #ffffff; /* White */
+  --color-muted: #f3f4f5; /* Light Gray 200 */
+  --color-primary: #191e23; /* Dark Gray 900 */
+  --color-secondary: #6c7781; /* Dark Gray 300 */
+  --color-accent: #ffb900; /* Accent Yellow */
+  --color-link: #46b450; /* Accent Green */
 
   --scale-ratio: 1.25;
   --scale0: 1rem;
@@ -27,10 +27,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #181a1b;
-    --color-primary: #d1cdc7;
-    --color-secondary: #aaa398;
-    --color-muted: #1e2021;
+    --color-background: #191e23; /* Dark Gray 900 */
+    --color-muted: #23282d; /* Dark Gray 800 */
+    --color-primary: #fbfbfc; /* Light Gray 100 */
+    --color-secondary: #ccd0d4; /* Light Gray 700 */
   }
 }
 
@@ -75,7 +75,7 @@ ul {
   padding-left: 1em;
 }
 
-li + li {
+:not(.icon-list, .tag-list) > li + li {
   margin-top: 0.4em;
 }
 
@@ -181,12 +181,20 @@ blockquote > * + * {
   margin-top: 0.6em;
 }
 
+.meta {
+  color: var(--color-secondary);
+}
+
 .stack {
   display: grid;
   gap: 1.5em;
 }
 
 .icon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1em;
+  justify-content: center;
   list-style: none;
   padding: 0;
 }
@@ -196,35 +204,23 @@ blockquote > * + * {
   gap: 1em;
 }
 
-.spaced-list {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.spaced-list::before {
-  border-bottom: 1px solid var(--color-muted);
-  content: '';
-  flex-grow: 1;
-  margin: 0 1em;
-  order: 1;
-}
-
-.spaced-list > :nth-child(2) {
-  order: 2;
-}
-
 .tag-list {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.4em;
   list-style: none;
   padding: 0;
 }
 
 .tag-list > li {
   background: var(--color-muted);
-  margin: 0 0.2em 0.2em 0;
+  border-radius: 0.2em;
   padding: 0.2em 0.6em;
+}
+
+.bullet-item:not(:first-child)::before {
+  content: '· ';
+  margin: 0 0.2em;
 }
 
 @media print, (min-width: 48em) {
@@ -252,8 +248,15 @@ blockquote > * + * {
     display: contents;
   }
 
+  .icon-list {
+    flex-direction: column;
+  }
+
   .grid-list {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(calc((100% - 1em) / 2), 1fr)
+    );
   }
 }
 </style>
@@ -282,157 +285,196 @@ blockquote > * + * {
         <div class="stack">
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Director - Data Science &amp; Growth</h4>
-                  <span>
-                    <time datetime="2020-06-30">Jun 2020</time> –
-                    Present
-                  </span>
+                <h4>Director - Experimentation</h4>
+                <div class="meta">
+                  <div>
+                    <strong>1Password</strong>
+                  </div>
+                  <div>
+                    <time datetime="2022-01-12">Jan 2022</time> –
+                    <time datetime="2021-10-18">Oct 2021</time>
+                  </div>
                 </div>
-                <strong>Rollbar</strong>
               </header>
-                <p>Founded the Growth org and led the Data Science team, reporting to the CEO. Set priorities, roadmaps, and strategy for both teams and hired technical leadership. Established a platform for experimentation and best practices for feature instrumentation. Growth activities included features, experiments, and competitive pricing. Improved Rollbar’s competitive differentiator (ML grouping of errors) by 35% and released anomaly detection, reducing alert noise by 80%.</p>
+                <p>Founded Experimentation team and led Marketing Analytics, reporting to executive leadership. Designed and built A/B testing platform, hired data science team, and ran customer acquisition growth (multiple 20%+ wins). Responsible for top-of-funnel reporting, quarterly/annual budget &amp; forecasting, data governance, and root cause analysis of anomalies.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Co-Founder</h4>
-                  <span>
+                <h4>Director - Data Science &amp; Growth</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Rollbar</strong>
+                  </div>
+                  <div>
+                    <time datetime="2020-06-30">Jun 2020</time> –
+                    <time datetime="2021-12-31">Dec 2021</time>
+                  </div>
+                </div>
+              </header>
+                <p>Founded the Growth org and led the Data Science team, reporting to the CEO. Set priorities, roadmaps &amp; strategy, and hired technical leadership. Established experimentation platform and best practices for new features, A/B tests, and pricing. Improved ML grouping of errors (Rollbar’s competitive differentiator) by 35% and reduced alert noise by 80%.</p>
+            </article>
+            <article>
+              <header>
+                <h4>Co-Founder</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Monett</strong>
+                  </div>
+                  <div>
                     <time datetime="2019-03-31">Mar 2019</time> –
                     <time datetime="2019-11-30">Nov 2019</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Monett</strong>
               </header>
                 <p>Co-founded fintech startup focused on helping independent contractors with their banking and taxes, targeting gig economy workers. As head of product and research, I secured initial funding, recruited and hired engineering &amp; design, and set sprint and epic priorities while building MVP.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Growth &amp; Monetization Lead</h4>
-                  <span>
+                <h4>Growth &amp; Monetization Lead</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Dropbox</strong>
+                  </div>
+                  <div>
                     <time datetime="2017-09-30">Sep 2017</time> –
                     <time datetime="2018-10-31">Oct 2018</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Dropbox</strong>
               </header>
                 <p>Led a team of 10 responsible for the growth of Dropbox's individual paid plans (representing the majority of revenue) through IPO. Launched free trials for Dropbox mobile and redesigned the over-quota user state (where most free users convert to paid). Web, email, and in-product experiments resulted in wins totaling $80m+ in annual recurring revenue.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Data Science Team Lead</h4>
-                  <span>
+                <h4>Data Science Team Lead</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Atlassian</strong>
+                  </div>
+                  <div>
                     <time datetime="2013-02-28">Feb 2013</time> –
                     <time datetime="2017-09-30">Sep 2017</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Atlassian</strong>
               </header>
                 <p>Founded, hired, and led the growth data science team (5 people) from pre- to post-IPO. Responsible for A/B testing, personalization, and optimization of Atlassian signup flows as well as research design for online marketing efficacy, causal inference, attribution, and ROAS models. Winning experiments resulted in 250,000 additional active users and millions of dollars in saved marketing spend. Recruited and interviewed the entire marketing analytics team of 10.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Experiment Design &amp; Analysis</h4>
-                  <span>
+                <h4>Experiment Design &amp; Analysis</h4>
+                <div class="meta">
+                  <div>
+                    <strong>eBay</strong>
+                  </div>
+                  <div>
                     <time datetime="2012-07-31">Jul 2012</time> –
                     <time datetime="2013-01-31">Jan 2013</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>eBay</strong>
               </header>
                 <p>Designed methodologies for generative research on web-scale data. Created and extended analytical, segment-based tools for more informed planning and improved efficiency in the experimentation of site-wide changes. Designed tools and protocols for running experiments on terabyte-scale datasets.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Statistical Consultant</h4>
-                  <span>
+                <h4>Statistical Consultant</h4>
+                <div class="meta">
+                  <div>
+                    <strong>United BioSource Corporation</strong>
+                  </div>
+                  <div>
                     <time datetime="2005-09-30">Sep 2005</time> –
                     <time datetime="2012-08-31">Aug 2012</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>United BioSource Corporation</strong>
               </header>
                 <p>Served as a lead statistical analyst in studies of disease course, therapeutic effects, and clinical adherence. Synthesized data across multiple sources, including large, multiple-hundred-gigabyte datasets.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Adjunct Professor</h4>
-                  <span>
+                <h4>Adjunct Professor</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Babson College</strong>
+                  </div>
+                  <div>
                     <time datetime="2012-01-31">Jan 2012</time> –
                     <time datetime="2012-06-30">Jun 2012</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Babson College</strong>
               </header>
                 <p>Taught graduate course in analytics, data-mining, and visualization with a focus on business applications.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Statistical Consultant</h4>
-                  <span>
+                <h4>Statistical Consultant</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Dyad Systems</strong>
+                  </div>
+                  <div>
                     <time datetime="2009-08-31">Aug 2009</time> –
                     <time datetime="2012-04-30">Apr 2012</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Dyad Systems</strong>
               </header>
                 <p>Planned and conducted statistical analysis of clinical trial data demonstrating the efﬁcacy of therapeutic interventions and medical devices.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Adjunct Professor</h4>
-                  <span>
+                <h4>Adjunct Professor</h4>
+                <div class="meta">
+                  <div>
+                    <strong>John Jay College</strong>
+                  </div>
+                  <div>
                     <time datetime="2008-08-31">Aug 2008</time> –
                     <time datetime="2011-01-31">Jan 2011</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>John Jay College</strong>
               </header>
                 <p>Developed and taught semester-length classes at the undergraduate, master's, and doctoral levels. Course topics included statistics, computer science, remedial mathematics, and calculus.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Research Fellow</h4>
-                  <span>
+                <h4>Research Fellow</h4>
+                <div class="meta">
+                  <div>
+                    <strong>International Technology Alliance</strong>
+                  </div>
+                  <div>
                     <time datetime="2007-12-31">Dec 2007</time> –
                     <time datetime="2009-01-31">Jan 2009</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>International Technology Alliance</strong>
               </header>
                 <p>Conducted novel cryptographic research within a consortium of universities and information industry partners alongside the U.S. Army Research Labs and U.K. Ministry of Defense / Government Communications Headquarters.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Statistical Researcher</h4>
-                  <span>
+                <h4>Statistical Researcher</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Human Services Research Institute</strong>
+                  </div>
+                  <div>
                     <time datetime="2003-04-30">Apr 2003</time> –
                     <time datetime="2006-08-31">Aug 2006</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Human Services Research Institute</strong>
               </header>
                 <p>Designed an economic and outcomes-based model of mental health systems based on Markov processes. Oversaw and conducted primary statistical analyses and meta-analytic comprehensive reviews. Researched meta-analysis of disparate Markov transition probability tables into a single simulation.</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Bioinformatics Analyst</h4>
-                  <span>
+                <h4>Bioinformatics Analyst</h4>
+                <div class="meta">
+                  <div>
+                    <strong>Whitehead Institute/ MIT Center for Genome Research</strong>
+                  </div>
+                  <div>
                     <time datetime="2002-01-31">Jan 2002</time> –
                     <time datetime="2004-04-30">Apr 2004</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Whitehead Institute/ MIT Center for Genome Research</strong>
               </header>
                 <p>Mapped portions of the human genome as a tiling path of bacterial artiﬁcial clones informed by disparate data sources &amp; comparative genomics. Collaborated in publishing the Human Genome Project, with two articles in Nature.</p>
             </article>
@@ -443,14 +485,14 @@ blockquote > * + * {
         <div class="stack">
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Board Director, Governance Chair</h4>
-                  <span>
+                <h4>Board Director, Governance Chair</h4>
+                <div class="meta">
+                  <strong>Felton Institute</strong>
+                  <div>
                     <time datetime="2018-07-31">Jul 2018</time> –
                     <time datetime="2021-06-30">Jun 2021</time>
-                  </span>
+                  </div>
                 </div>
-                <strong>Felton Institute</strong>
               </header>
             </article>
         </div>
@@ -460,27 +502,40 @@ blockquote > * + * {
         <div class="stack">
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>City University of New York Graduate Center</h4>
-                  <span>
+                <h4>City University of New York Graduate Center</h4>
+                <div class="meta">
+                    <strong>Mathematics</strong>
+                  <div>
                     <time datetime="2006-12-31">Dec 2006</time> –
                     <time datetime="2010-12-31">Dec 2010</time>
-                  </span>
+                  </div>
                 </div>
-                  <strong>Mathematics</strong>
+              </header>
+                <p>Doctor of Philosophy (ABD)</p>
+            </article>
+            <article>
+              <header>
+                <h4>City University of New York Graduate Center</h4>
+                <div class="meta">
+                    <strong>Mathematics</strong>
+                  <div>
+                    <time datetime="2006-12-31">Dec 2006</time> –
+                    <time datetime="2010-12-31">Dec 2010</time>
+                  </div>
+                </div>
               </header>
                 <p>Master of Arts</p>
             </article>
             <article>
               <header>
-                <div class="spaced-list">
-                  <h4>Wheaton College (MA)</h4>
-                  <span>
+                <h4>Wheaton College (MA)</h4>
+                <div class="meta">
+                    <strong>Mathematics</strong>
+                  <div>
                     <time datetime="1999-12-31">Dec 1999</time> –
                     <time datetime="2002-12-31">Dec 2002</time>
-                  </span>
+                  </div>
                 </div>
-                  <strong>Mathematics</strong>
               </header>
                 <p>Bachelor of Arts</p>
             </article>

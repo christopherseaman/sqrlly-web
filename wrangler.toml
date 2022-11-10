@@ -3,7 +3,7 @@ type = "webpack"
 account_id = "dae1fda6fab9813c1aff8a4c60d48bc5"
 workers_dev = true
 route = "sqrl.ly/*"
-zone_id = "2b00278f8baa9fb70a84b335674c610f"
+compatibility_date = "2022-11-10"
 
 [site]
 bucket = "./public"
