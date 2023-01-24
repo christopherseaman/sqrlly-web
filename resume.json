@@ -1,0 +1,178 @@
+{
+	"meta": {
+		"theme": "even"
+	},
+	"basics": {
+		"name": "Christopher Seaman",
+		"label": "Building data science and growth teams",
+		"picture": "",
+		"email": "chris@badmath.org",
+		"website": "badmath.org",
+		"location": {
+			"countryCode": "San Francisco, CA - USA"
+		},
+		"profiles": [{
+			"network": "LinkedIn",
+			"username": "christopherseaman",
+			"url": "https://www.linkedin.com/in/christopherseaman/"
+		}]
+	},
+	"work": [{
+			"name": "1Password",
+			"highlights": [],
+			"summary": "Founded Experimentation team and led Marketing Analytics, reporting to executive leadership. Designed and built A/B testing platform, hired data science team, and ran customer acquisition growth (multiple 20%+ wins). Responsible for top-of-funnel reporting, quarterly/annual budget & forecasting, data governance, and root cause analysis of anomalies.",
+			"position": "Director - Experimentation",
+			"startDate": "2022-01-12",
+			"endDate": "2021-10-18",
+			"website": "https://www.linkedin.com/company/1password/"
+		},{
+			"name": "Rollbar",
+			"highlights": [],
+			"summary": "Founded the Growth org and led the Data Science team, reporting to the CEO. Set priorities, roadmaps & strategy, and hired technical leadership. Established experimentation platform and best practices for new features, A/B tests, and pricing. Improved ML grouping of errors (Rollbar’s competitive differentiator) by 35% and reduced alert noise by 80%.",
+			"position": "Director - Data Science & Growth",
+			"startDate": "2020-06-30",
+			"endDate": "2021-12-31",
+			"website": "https://www.linkedin.com/company/rollbar/"
+		},
+		{
+			"name": "Monett",
+			"endDate": "2019-11-30",
+			"highlights": [],
+			"position": "Co-Founder",
+			"startDate": "2019-03-31",
+			"summary": "Co-founded fintech startup focused on helping independent contractors with their banking and taxes, targeting gig economy workers. As head of product and research, I secured initial funding, recruited and hired engineering & design, and set sprint and epic priorities while building MVP.",
+			"website": "https://www.linkedin.com/company/usemonett/"
+		},
+		{
+			"name": "Dropbox",
+			"endDate": "2018-10-31",
+			"highlights": [],
+			"position": "Growth & Monetization Lead",
+			"startDate": "2017-09-30",
+			"summary": "Led a team of 10 responsible for the growth of Dropbox's individual paid plans (representing the majority of revenue) through IPO. Launched free trials for Dropbox mobile and redesigned the over-quota user state (where most free users convert to paid). Web, email, and in-product experiments resulted in wins totaling $80m+ in annual recurring revenue.",
+			"website": "https://www.linkedin.com/company/dropbox/"
+		},
+		{
+			"name": "Atlassian",
+			"endDate": "2017-09-30",
+			"highlights": [],
+			"position": "Data Science Team Lead",
+			"startDate": "2013-02-28",
+			"summary": "Founded, hired, and led the growth data science team (5 people) from pre- to post-IPO. Responsible for A/B testing, personalization, and optimization of Atlassian signup flows as well as research design for online marketing efficacy, causal inference, attribution, and ROAS models. Winning experiments resulted in 250,000 additional active users and millions of dollars in saved marketing spend. Recruited and interviewed the entire marketing analytics team of 10.",
+			"website": "https://www.linkedin.com/company/atlassian/"
+		},
+		{
+			"name": "eBay",
+			"endDate": "2013-01-31",
+			"highlights": [],
+			"position": "Experiment Design & Analysis",
+			"startDate": "2012-07-31",
+			"summary": "Designed methodologies for generative research on web-scale data. Created and extended analytical, segment-based tools for more informed planning and improved efficiency in the experimentation of site-wide changes. Designed tools and protocols for running experiments on terabyte-scale datasets.",
+			"website": "https://www.linkedin.com/company/ebay/"
+		},
+		{
+			"name": "United BioSource Corporation",
+			"endDate": "2012-08-31",
+			"highlights": [],
+			"position": "Statistical Consultant",
+			"startDate": "2005-09-30",
+			"summary": "Served as a lead statistical analyst in studies of disease course, therapeutic effects, and clinical adherence. Synthesized data across multiple sources, including large, multiple-hundred-gigabyte datasets.",
+			"website": "https://www.linkedin.com/company/united-biosource/"
+		},
+		{
+			"name": "Babson College",
+			"endDate": "2012-06-30",
+			"highlights": [],
+			"position": "Adjunct Professor",
+			"startDate": "2012-01-31",
+			"summary": "Taught graduate course in analytics, data-mining, and visualization with a focus on business applications.",
+			"website": "https://www.linkedin.com/school/babson-college/"
+		},
+		{
+			"name": "Dyad Systems",
+			"endDate": "2012-04-30",
+			"highlights": [],
+			"position": "Statistical Consultant",
+			"startDate": "2009-08-31",
+			"summary": "Planned and conducted statistical analysis of clinical trial data demonstrating the efﬁcacy of therapeutic interventions and medical devices.",
+			"website": "https://www.linkedin.com/company/dyad-systems/"
+		},
+		{
+			"name": "John Jay College",
+			"endDate": "2011-01-31",
+			"highlights": [],
+			"position": "Adjunct Professor",
+			"startDate": "2008-08-31",
+			"summary": "Developed and taught semester-length classes at the undergraduate, master's, and doctoral levels. Course topics included statistics, computer science, remedial mathematics, and calculus.",
+			"website": "https://www.linkedin.com/school/johnjaycollege/"
+		},
+		{
+			"name": "International Technology Alliance",
+			"endDate": "2009-01-31",
+			"highlights": [],
+			"position": "Research Fellow",
+			"startDate": "2007-12-31",
+			"summary": "Conducted novel cryptographic research within a consortium of universities and information industry partners alongside the U.S. Army Research Labs and U.K. Ministry of Defense / Government Communications Headquarters.",
+			"website": ""
+		},
+		{
+			"name": "Human Services Research Institute",
+			"endDate": "2006-08-31",
+			"highlights": [],
+			"position": "Statistical Researcher",
+			"startDate": "2003-04-30",
+			"summary": "Designed an economic and outcomes-based model of mental health systems based on Markov processes. Oversaw and conducted primary statistical analyses and meta-analytic comprehensive reviews. Researched meta-analysis of disparate Markov transition probability tables into a single simulation.",
+			"website": ""
+		},
+		{
+			"name": "Whitehead Institute/ MIT Center for Genome Research",
+			"endDate": "2004-04-30",
+			"highlights": [],
+			"position": "Bioinformatics Analyst",
+			"startDate": "2002-01-31",
+			"summary": "Mapped portions of the human genome as a tiling path of bacterial artiﬁcial clones informed by disparate data sources & comparative genomics. Collaborated in publishing the Human Genome Project, with two articles in Nature.",
+			"website": "https://www.linkedin.com/company/whitehead-institute/"
+		}
+	],
+	"volunteer": [{
+		"organization": "Felton Institute",
+		"position": "Board Director, Governance Chair",
+		"website": "https://www.linkedin.com/company/8135521",
+		"startDate": "2018-07-31",
+		"endDate": "2021-06-30",
+		"highlights": []
+	}],
+	"education": [{
+			"institution": "City University of New York Graduate Center",
+			"area": "Mathematics",
+			"studyType": "Doctor of Philosophy (ABD)",
+			"startDate": "2006-12-31",
+			"endDate": "2010-12-31",
+			"gpa": "",
+			"courses": []
+		},{
+			"institution": "City University of New York Graduate Center",
+			"area": "Mathematics",
+			"studyType": "Master of Arts",
+			"startDate": "2006-12-31",
+			"endDate": "2010-12-31",
+			"gpa": "",
+			"courses": []
+		},
+		{
+			"institution": "Wheaton College (MA)",
+			"area": "Mathematics",
+			"studyType": "Bachelor of Arts",
+			"startDate": "1999-12-31",
+			"endDate": "2002-12-31",
+			"gpa": "",
+			"courses": []
+		}
+	],
+	"awards": [],
+	"publications": [],
+	"skills": [],
+	"languages": [],
+	"interests": [],
+	"references": []
+}
