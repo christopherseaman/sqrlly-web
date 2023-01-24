@@ -1,8 +1,0 @@
-name = "sqrlly-web"
-name = "sqrlly"
-type = "webpack"
-account_id = "dae1fda6fab9813c1aff8a4c60d48bc5"
-workers_dev = true
-route = "sqrl.ly/*"
-compatibility_date = "2022-11-10"
-bucket = "./public"
