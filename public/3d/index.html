@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Variable Plot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            overflow-x: hidden;
+            touch-action: none;
+        }
+
+    @media (max-width: 768px) {
+        body { padding: 5px; }
+    }
+    
+    h1 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-size: clamp(1.2rem, 4vw, 2rem);
+    }
+    
+    #container {
+        width: 100%;
+        height: 70vh;
+        min-height: 400px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 15px;
+        position: relative;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        touch-action: none;
+    }
+    
+    #info {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 100;
+        background: rgba(0,0,0,0.8);
+        padding: 10px;
+        border-radius: 8px;
+        max-width: 250px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        font-size: 12px;
+    }
+    
+    @media (max-width: 768px) {
+        #info {
+            font-size: 11px;
+            padding: 8px;
+            max-width: 200px;
+        }
+    }
+    
+    .legend {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    @media (max-width: 768px) {
+        .legend {
+            gap: 10px;
+            padding: 10px;
+        }
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+        font-size: clamp(11px, 2.5vw, 14px);
+    }
+    
+    .color-box {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    #controls {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #e0e0e0;
+    }
+</style>
+```
+
+</head>
+<body>
+    <h1>3D Variable Plot by Factor Categories</h1>
+
+```
+<div id="container">
+    <div id="info">
+        <strong>Controls:</strong><br>
+        • Touch + drag: Rotate<br>
+        • Pinch: Zoom in/out<br>
+        • Tap: View details
+    </div>
+</div>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="color-box" style="background: #ff6b6b;"></div>
+        <span>Language (4)</span>
+    </div>
+    <div class="legend-item">
+        <div class="color-box" style="background: #4ecdc4;"></div>
+        <span>Motor (6)</span>
+    </div>
+    <div class="legend-item">
+        <div class="color-box" style="background: #45b7d1;"></div>
+        <span>VizSpat_Math (4)</span>
+    </div>
+    <div class="legend-item">
+        <div class="color-box" style="background: #f7d794;"></div>
+        <span>Attention (3)</span>
+    </div>
+    <div class="legend-item">
+        <div class="color-box" style="background: #c44569;"></div>
+        <span>Social (2)</span>
+    </div>
+    <div class="legend-item">
+        <div class="color-box" style="background: #a55eea;"></div>
+        <span>Orphan (2)</span>
+    </div>
+</div>
+
+<div id="controls">
+    Touch and drag to rotate • Pinch to zoom • Tap points for details
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script>
+    // Data loading and parsing
+    let data = [];
+    let colorMap = {};
+    let uniqueFactors = [];
+    
+    // Scene setup (will be called after data loads)
+    let scene, camera, renderer, spheres = [];
+    let isInteracting = false;
+    let mouseX = 0, mouseY = 0;
+    let rotationX = 0, rotationY = 0;
+    let cameraDistance = 10;
+    let lastTouchDistance = 0;
+
+    // Load data from TSV file
+    async function loadData() {
+        try {
+            // Try relative path first, then absolute URL
+            let response;
+            try {
+                response = await fetch('plot-data.tsv');
+                if (!response.ok) throw new Error('Local file not found');
+            } catch (e) {
+                response = await fetch('http://dl.badmath.org/3d/plot-data.tsv');
+            }
+            
+            const tsvText = await response.text();
+            
+            // Parse TSV using PapaParse
+            const parsed = Papa.parse(tsvText, {
+                header: true,
+                delimiter: '\t',
+                dynamicTyping: true,
+                skipEmptyLines: true
+            });
+            
+            data = parsed.data;
+            
+            // Extract unique factors and create color mapping
+            uniqueFactors = [...new Set(data.map(d => d.Factor))];
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
+            
+            colorMap = {};
+            uniqueFactors.forEach((factor, i) => {
+                colorMap[factor] = parseInt(colors[i % colors.length].replace('#', '0x'));
+            });
+            
+            // Update legend
+            updateLegend();
+            
+            // Initialize 3D scene
+            initScene();
+            
+            console.log(`Loaded ${data.length} data points with factors:`, uniqueFactors);
+            
+        } catch (error) {
+            console.error('Error loading data:', error);
+            document.getElementById('info').innerHTML = `
+                <strong>Error loading data:</strong><br>
+                ${error.message}<br><br>
+                Please ensure plot-data.tsv is available.
+            `;
+        }
+    }
+    
+    function updateLegend() {
+        const legend = document.querySelector('.legend');
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
+        
+        legend.innerHTML = uniqueFactors.map((factor, i) => {
+            const count = data.filter(d => d.Factor === factor).length;
+            return `
+                <div class="legend-item">
+                    <div class="color-box" style="background: ${colors[i % colors.length]};"></div>
+                    <span>${factor} (${count})</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function initScene() {
+        // Scene setup
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2a2a2a);
+        
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        const container = document.getElementById('container');
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // Create axes
+        scene.add(createAxes());
+
+        // Create data points
+        createDataPoints();
+
+        // Set up camera
+        camera.position.set(5, 5, 5);
+        camera.lookAt(0, 0, 0);
+
+        // Set up controls
+        setupControls();
+
+        // Set up lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        // Start animation
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    }
+
+    // Create axes
+    function createAxes() {
+        const axesGroup = new THREE.Group();
+        const axisLength = 6;
+        
+        // X-axis (red)
+        const xGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0), new THREE.Vector3(axisLength, 0, 0)
+        ]);
+        const xAxis = new THREE.Line(xGeometry, new THREE.LineBasicMaterial({ color: 0xff4444 }));
+        axesGroup.add(xAxis);
+        
+        // Y-axis (green)
+        const yGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, axisLength, 0)
+        ]);
+        const yAxis = new THREE.Line(yGeometry, new THREE.LineBasicMaterial({ color: 0x44ff44 }));
+        axesGroup.add(yAxis);
+        
+        // Z-axis (blue)
+        const zGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, axisLength)
+        ]);
+        const zAxis = new THREE.Line(zGeometry, new THREE.LineBasicMaterial({ color: 0x4444ff }));
+        axesGroup.add(zAxis);
+        
+        return axesGroup;
+    }
+
+    scene.add(createAxes());
+
+    function createDataPoints() {
+        const pointsGroup = new THREE.Group();
+        spheres = [];
+
+        data.forEach((point) => {
+            const geometry = new THREE.SphereGeometry(0.12, 16, 16);
+            const material = new THREE.MeshLambertMaterial({ 
+                color: colorMap[point.Factor],
+                transparent: true,
+                opacity: 0.85
+            });
+            
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.set(point.Dim1, point.Dim2, point.Dim3);
+            sphere.userData = { variable: point.Variable, factor: point.Factor };
+            
+            pointsGroup.add(sphere);
+            spheres.push(sphere);
+        });
+
+        scene.add(pointsGroup);
+    }
+
+    function setupControls() {
+        // Camera controls with mobile support
+        camera.position.set(5, 5, 5);
+        camera.lookAt(0, 0, 0);
+
+    function getInputCoords(event) {
+        if (event.touches && event.touches.length > 0) {
+            return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        }
+        return { x: event.clientX, y: event.clientY };
+    }
+
+    function getTouchDistance(event) {
+        if (event.touches.length === 2) {
+            const dx = event.touches[0].clientX - event.touches[1].clientX;
+            const dy = event.touches[0].clientY - event.touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        return 0;
+    }
+
+    function onPointerStart(event) {
+        event.preventDefault();
+        isInteracting = true;
+        const coords = getInputCoords(event);
+        mouseX = coords.x;
+        mouseY = coords.y;
+        
+        if (event.touches && event.touches.length === 2) {
+            lastTouchDistance = getTouchDistance(event);
+        }
+    }
+
+    function onPointerMove(event) {
+        if (!isInteracting) return;
+        event.preventDefault();
+        
+        if (event.touches && event.touches.length === 2) {
+            const touchDistance = getTouchDistance(event);
+            if (lastTouchDistance > 0) {
+                const scale = touchDistance / lastTouchDistance;
+                cameraDistance /= scale;
+                cameraDistance = Math.max(3, Math.min(20, cameraDistance));
+            }
+            lastTouchDistance = touchDistance;
+        } else {
+            const coords = getInputCoords(event);
+            const deltaX = coords.x - mouseX;
+            const deltaY = coords.y - mouseY;
+            
+            rotationY += deltaX * 0.01;
+            rotationX += deltaY * 0.01;
+            rotationX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotationX));
+            
+            mouseX = coords.x;
+            mouseY = coords.y;
+        }
+        
+        updateCameraPosition();
+    }
+
+    function onPointerEnd(event) {
+        isInteracting = false;
+        lastTouchDistance = 0;
+    }
+
+    function updateCameraPosition() {
+        const x = cameraDistance * Math.sin(rotationY) * Math.cos(rotationX);
+        const y = cameraDistance * Math.sin(rotationX);
+        const z = cameraDistance * Math.cos(rotationY) * Math.cos(rotationX);
+        
+        camera.position.set(x, y, z);
+        camera.lookAt(0, 0, 0);
+    }
+
+        // Event listeners
+        renderer.domElement.addEventListener('mousedown', onPointerStart, { passive: false });
+        renderer.domElement.addEventListener('touchstart', onPointerStart, { passive: false });
+        renderer.domElement.addEventListener('mousemove', onPointerMove, { passive: false });
+        renderer.domElement.addEventListener('touchmove', onPointerMove, { passive: false });
+        renderer.domElement.addEventListener('mouseup', onPointerEnd);
+        renderer.domElement.addEventListener('touchend', onPointerEnd);
+        renderer.domElement.addEventListener('touchcancel', onPointerEnd);
+
+        renderer.domElement.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            cameraDistance += event.deltaY * 0.01;
+            cameraDistance = Math.max(3, Math.min(20, cameraDistance));
+            updateCameraPosition();
+        }, { passive: false });
+
+        // Interaction detection
+        renderer.domElement.addEventListener('click', onTap);
+        renderer.domElement.addEventListener('touchend', (event) => {
+            if (event.touches.length === 0 && !isInteracting) {
+                onTap(event);
+            }
+        });
+    }
+
+    // Animation loop
+    function animate() {
+        if (!scene || !camera || !renderer) return;
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+
+    // Start loading data when page loads
+    window.addEventListener('load', loadData);
+</script>
+
+</body>
+</html>
