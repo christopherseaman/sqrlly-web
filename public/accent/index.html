@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Perfect Purple Palette - 6 Curated Options</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .toggle-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #a8b5f0 0%, #b49fdf 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+        
+        .current-flooring {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+        
+        .color-option {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            height: 320px;
+        }
+        
+        .color-option:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        
+        .flooring-background {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .flooring-background.hidden {
+            opacity: 0;
+        }
+        
+        .color-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 220px;
+            background: rgba(0,0,0,0.05);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        
+        .wall-preview {
+            width: 100px;
+            height: 180px;
+            border-radius: 12px;
+            border: 3px solid rgba(255,255,255,0.95);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            backdrop-filter: blur(4px);
+        }
+        
+        .color-swatches {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .color-swatch {
+            width: 120px;
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+        
+        .color-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            height: 100px;
+        }
+        
+        .color-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        
+        .color-code {
+            font-size: 12px;
+            font-family: monospace;
+            color: #666;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        
+        .description {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #555;
+        }
+        
+        .intensity-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* 6 perfectly curated purples with fun names */
+        .misty-periwinkle { background: linear-gradient(135deg, #bcc7e8 0%, #c8d3f0 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
+        .cloud-nine { background: linear-gradient(135deg, #a8b5f0 0%, #b4c1f6 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
+        .twilight-mist { background: linear-gradient(135deg, #c6b3dc 0%, #d2c0e8 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
+        .amethyst-whisper { background: linear-gradient(135deg, #b49fdf 0%, #c0aae5 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
+        .digital-dreams { background: linear-gradient(135deg, #8fa6ea 0%, #9bb2f0 100%); }
+        .cosmic-gradient { background: linear-gradient(135deg, #7a8eeb 0%, #8c65b8 100%); }
+        
+        .simply-white { 
+            background: linear-gradient(135deg, #faf9f7 0%, #f8f7f5 100%); 
+            color: #333 !important; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2) !important;
+        }
+        
+        .recommendations {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        
+        .rec-header {
+            background: linear-gradient(135deg, #a8b5f0 0%, #b49fdf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .spectrum-bar {
+            height: 40px;
+            background: linear-gradient(to right, 
+                #bcc7e8 0%, 
+                #a8b5f0 20%, 
+                #c6b3dc 40%, 
+                #b49fdf 60%, 
+                #8fa6ea 80%, 
+                #7a8eeb 100%);
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .rec-item {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 5px solid;
+        }
+        
+        .rec-gentle { border-left-color: #bcc7e8; }
+        .rec-balanced { border-left-color: #a8b5f0; }
+        .rec-yours { border-left-color: #c6b3dc; }
+        .rec-mine { border-left-color: #b49fdf; }
+        .rec-modern { border-left-color: #8fa6ea; }
+        .rec-bold { border-left-color: #7a8eeb; }
+        
+        .rec-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .rec-color {
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .rec-desc {
+            color: #888;
+            font-size: 11px;
+        }
+        
+        .note {
+            background: linear-gradient(135deg, #f0f2ff 0%, #f5f0ff 100%);
+            border: 1px solid #e0e6ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #5a67d8;
+        }
+        
+        .note strong {
+            color: #4c51bf;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Perfect Purple Palette</h1>
+        
+        <div class="controls">
+            <div class="toggle-container">
+                <span class="toggle-label">Brazilian Cherry</span>
+                <div class="toggle-switch" id="flooringToggle"></div>
+                <span class="toggle-label">Jatoba</span>
+            </div>
+            
+            <div class="spectrum-bar"></div>
+            <div class="spectrum-labels">
+                <span>Misty Periwinkle</span>
+                <span>Cloud Nine</span>
+                <span>Twilight Mist</span>
+                <span>Amethyst Whisper</span>
+                <span>Digital Dreams</span>
+                <span>Cosmic Gradient</span>
+            </div>
+        </div>
+        
+        <div class="color-grid">
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview misty-periwinkle">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch misty-periwinkle">Misty Periwinkle</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Gentle</div>
+                <div class="color-info">
+                    <div class="color-name">Misty Periwinkle</div>
+                    <div class="color-code">#bcc7e8</div>
+                    <div class="description">Soft blue-purple like morning mist. The gentlest entry into purple territory - fresh and serene.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview cloud-nine">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch cloud-nine">Cloud Nine</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Balanced</div>
+                <div class="color-info">
+                    <div class="color-name">Cloud Nine</div>
+                    <div class="color-code">#a8b5f0</div>
+                    <div class="description">Perfect balance of blue and purple - like floating on clouds. Modern and sophisticated.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview twilight-mist">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch twilight-mist">Twilight Mist</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Your Pick</div>
+                <div class="color-info">
+                    <div class="color-name">Twilight Mist</div>
+                    <div class="color-code">#c6b3dc</div>
+                    <div class="description">YOUR CHOICE: Elegant twilight purple - more purple than Cloud Nine, beautifully refined and sophisticated.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview amethyst-whisper">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch amethyst-whisper">Amethyst Whisper</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Sweet Spot</div>
+                <div class="color-info">
+                    <div class="color-name">Amethyst Whisper</div>
+                    <div class="color-code">#b49fdf</div>
+                    <div class="description">Soft amethyst tones with a whisper of mystery. Rich enough to make a statement, light enough to live with.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview digital-dreams">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch digital-dreams">Digital Dreams</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Tech Vibes</div>
+                <div class="color-info">
+                    <div class="color-name">Digital Dreams</div>
+                    <div class="color-code">#8fa6ea</div>
+                    <div class="description">Contemporary tech-inspired purple-blue. Modern innovation meets timeless elegance.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview cosmic-gradient">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch cosmic-gradient">Cosmic Gradient</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Bold Vision</div>
+                <div class="color-info">
+                    <div class="color-name">Cosmic Gradient</div>
+                    <div class="color-code">#7a8eeb → #8c65b8</div>
+                    <div class="description">Your original MacOS purple gradient - cosmic and bold. The full realization of your purple vision.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recommendations">
+            <h3 class="rec-header">The Perfect Purple Guide</h3>
+            <div class="rec-grid">
+                <div class="rec-item rec-gentle">
+                    <div class="rec-title">Safest Start</div>
+                    <div class="rec-color">Misty Periwinkle</div>
+                    <div class="rec-desc">Gentle blue-purple</div>
+                </div>
+                <div class="rec-item rec-balanced">
+                    <div class="rec-title">Perfect Balance</div>
+                    <div class="rec-color">Cloud Nine</div>
+                    <div class="rec-desc">Equal blue + purple</div>
+                </div>
+                <div class="rec-item rec-yours">
+                    <div class="rec-title">Your Choice ⭐</div>
+                    <div class="rec-color">Twilight Mist</div>
+                    <div class="rec-desc">Refined elegance</div>
+                </div>
+                <div class="rec-item rec-mine">
+                    <div class="rec-title">Sweet Spot</div>
+                    <div class="rec-color">Amethyst Whisper</div>
+                    <div class="rec-desc">Rich but liveable</div>
+                </div>
+                <div class="rec-item rec-modern">
+                    <div class="rec-title">Tech Modern</div>
+                    <div class="rec-color">Digital Dreams</div>
+                    <div class="rec-desc">Contemporary edge</div>
+                </div>
+                <div class="rec-item rec-bold">
+                    <div class="rec-title">Original Vision</div>
+                    <div class="rec-color">Cosmic Gradient</div>
+                    <div class="rec-desc">Bold MacOS purple</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const toggle = document.getElementById('flooringToggle');
+        const currentFlooringText = document.getElementById('currentFlooring');
+        const brazilianCherryImages = document.querySelectorAll('.brazilian-cherry');
+        const jatobaImages = document.querySelectorAll('.jatoba');
+        
+        let isJatoba = false;
+        
+        toggle.addEventListener('click', function() {
+            isJatoba = !isJatoba;
+            
+            if (isJatoba) {
+                toggle.classList.add('active');
+                brazilianCherryImages.forEach(img => img.classList.add('hidden'));
+                jatobaImages.forEach(img => img.classList.remove('hidden'));
+            } else {
+                toggle.classList.remove('active');
+                brazilianCherryImages.forEach(img => img.classList.remove('hidden'));
+                jatobaImages.forEach(img => img.classList.add('hidden'));
+            }
+        });
+    </script>
+</body>
+</html>
