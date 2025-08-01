@@ -255,8 +255,8 @@
                 const coords = e.touches ? e.touches[0] : e;
                 const deltaX = coords.clientX - mouseX;
                 const deltaY = coords.clientY - mouseY;
-                rotY -= deltaX * 0.01;
-                rotX -= deltaY * 0.01;
+                rotY += deltaX * 0.01;
+                rotX += deltaY * 0.01;
                 rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX));
                 mouseX = coords.clientX;
                 mouseY = coords.clientY;
