@@ -3,27 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Variable Plot</title>
+    <title>3D Variable Plot</title>
     <style>
         body {
             margin: 0;
             padding: 10px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
-            overflow-x: hidden;
             touch-action: none;
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 5px; }
         }
         
         h1 {
             text-align: center;
             margin-bottom: 15px;
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             font-size: clamp(1.2rem, 4vw, 2rem);
         }
         
@@ -34,9 +27,6 @@
             background: rgba(0,0,0,0.3);
             border-radius: 15px;
             position: relative;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
             touch-action: none;
         }
         
@@ -49,17 +39,7 @@
             padding: 10px;
             border-radius: 8px;
             max-width: 250px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
             font-size: 12px;
-        }
-        
-        @media (max-width: 768px) {
-            #info {
-                font-size: 11px;
-                padding: 8px;
-                max-width: 200px;
-            }
         }
         
         .legend {
@@ -71,14 +51,6 @@
             background: rgba(255,255,255,0.1);
             padding: 15px;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-        
-        @media (max-width: 768px) {
-            .legend {
-                gap: 10px;
-                padding: 10px;
-            }
         }
         
         .legend-item {
@@ -86,426 +58,294 @@
             align-items: center;
             gap: 6px;
             font-weight: 500;
-            font-size: clamp(11px, 2.5vw, 14px);
         }
         
         .color-box {
             width: 18px;
             height: 18px;
             border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        #controls {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #e0e0e0;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1>3D Variable Plot by Factor Categories</h1>
+    <h1>3D Variable Plot</h1>
     
     <div id="container">
         <div id="info">
-            <strong>Loading data...</strong><br>
-            Trying plot-data.tsv
+            <strong>Controls:</strong><br>
+            • Drag: Rotate<br>
+            • Scroll/Pinch: Zoom<br>
+            • Tap: Select point
         </div>
     </div>
     
-    <div class="legend" id="legend">
-        <div class="loading">Loading data...</div>
-    </div>
-    
-    <div id="controls">
-        Touch and drag to rotate • Pinch to zoom • Tap points for details
+    <div class="legend">
+        <div class="legend-item">
+            <div class="color-box" style="background: #ff6b6b;"></div>
+            <span>Language (4)</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background: #4ecdc4;"></div>
+            <span>Motor (6)</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background: #45b7d1;"></div>
+            <span>VizSpat_Math (4)</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background: #f7d794;"></div>
+            <span>Attention (3)</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background: #c44569;"></div>
+            <span>Social (2)</span>
+        </div>
+        <div class="legend-item">
+            <div class="color-box" style="background: #a55eea;"></div>
+            <span>Orphan (2)</span>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // Global variables
+        // Embedded fallback data
+        const fallbackData = [
+            {Variable: "DiffRead", Dim1: 1.238, Dim2: -0.045, Dim3: -0.2295, Factor: "Language"},
+            {Variable: "DiffSpell", Dim1: 1.8774, Dim2: -0.8018, Dim3: 0.017, Factor: "Language"},
+            {Variable: "Stutter", Dim1: 0.0359, Dim2: -0.0642, Dim3: -0.1621, Factor: "Language"},
+            {Variable: "VerbalIn", Dim1: 0.1731, Dim2: 0.1948, Dim3: -0.1769, Factor: "Language"},
+            {Variable: "DiffHand", Dim1: 0.7669, Dim2: -0.4953, Dim3: 0.6001, Factor: "Motor"},
+            {Variable: "Clumsy", Dim1: 0.1312, Dim2: -0.7774, Dim3: -0.098, Factor: "Motor"},
+            {Variable: "MotorTic", Dim1: 0.1595, Dim2: -0.0113, Dim3: -0.2398, Factor: "Motor"},
+            {Variable: "DiffMath", Dim1: 1.0343, Dim2: 1.784, Dim3: -0.695, Factor: "VizSpat_Math"},
+            {Variable: "DiffGeom", Dim1: 0.9249, Dim2: 2.2854, Dim3: -0.8392, Factor: "VizSpat_Math"},
+            {Variable: "L_Rconf", Dim1: 0.7634, Dim2: -1.1755, Dim3: 0.1672, Factor: "Motor"},
+            {Variable: "DiffNavi", Dim1: 0.8354, Dim2: -0.1435, Dim3: -0.9308, Factor: "VizSpat_Math"},
+            {Variable: "DiffMap", Dim1: 0.6858, Dim2: 0.1603, Dim3: -0.1224, Factor: "VizSpat_Math"},
+            {Variable: "DiffDraw", Dim1: 0.5208, Dim2: -0.2991, Dim3: 1.6263, Factor: "Motor"},
+            {Variable: "DiffRhy", Dim1: 0.4258, Dim2: -1.3697, Dim3: -0.0466, Factor: "Motor"},
+            {Variable: "FreqMist", Dim1: 0.0776, Dim2: 0.7209, Dim3: 0.6961, Factor: "Attention"},
+            {Variable: "BoredEas", Dim1: -1.1012, Dim2: 0.5841, Dim3: 1.9621, Factor: "Attention"},
+            {Variable: "DiffAtt", Dim1: -0.7167, Dim2: 1.0276, Dim3: 1.1602, Factor: "Attention"},
+            {Variable: "AfraidMeet", Dim1: -1.8845, Dim2: -1.1798, Dim3: -1.0702, Factor: "Social"},
+            {Variable: "PreferAlone", Dim1: -3.8078, Dim2: -0.4847, Dim3: -0.309, Factor: "Social"},
+            {Variable: "AfraidNew", Dim1: -1.36, Dim2: -0.2304, Dim3: -1.3577, Factor: "Orphan"},
+            {Variable: "Tantrums", Dim1: -0.8194, Dim2: 0.3506, Dim3: 0.0482, Factor: "Orphan"}
+        ];
+
         let data = [];
-        let colorMap = {};
-        let uniqueFactors = [];
-        let scene, camera, renderer, spheres = [];
-        let isInteracting = false;
-        let mouseX = 0, mouseY = 0;
-        let rotationX = 0, rotationY = 0;
-        let cameraDistance = 10;
-        let lastTouchDistance = 0;
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let selectedObject = null;
-        const infoDiv = document.getElementById('info');
-
-        // Load data from TSV file
-        async function loadData() {
-            const urls = [
-                'plot-data.tsv',
-                'http://dl.badmath.org/3d/plot-data.tsv'
-            ];
-            
-            for (let i = 0; i < urls.length; i++) {
-                try {
-                    infoDiv.innerHTML = `<strong>Loading data...</strong><br>Trying: ${urls[i]}`;
-                    
-                    const response = await fetch(urls[i]);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const tsvText = await response.text();
-                    
-                    // Parse TSV using PapaParse
-                    const parsed = Papa.parse(tsvText, {
-                        header: true,
-                        delimiter: '\t',
-                        dynamicTyping: true,
-                        skipEmptyLines: true
-                    });
-                    
-                    if (parsed.errors.length > 0) {
-                        throw new Error(`Parse errors: ${parsed.errors[0].message}`);
-                    }
-                    
-                    data = parsed.data.filter(row => row.Variable && row.Factor); // Remove empty rows
-                    
-                    if (data.length === 0) {
-                        throw new Error('No valid data found in file');
-                    }
-                    
-                    // Extract unique factors and create color mapping
-                    uniqueFactors = [...new Set(data.map(d => d.Factor))];
-                    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
-                    
-                    colorMap = {};
-                    uniqueFactors.forEach((factor, index) => {
-                        colorMap[factor] = parseInt(colors[index % colors.length].replace('#', '0x'));
-                    });
-                    
-                    // Update legend
-                    updateLegend();
-                    
-                    // Initialize 3D scene
-                    initScene();
-                    
-                    console.log(`Successfully loaded ${data.length} data points with factors:`, uniqueFactors);
-                    return; // Success - exit the function
-                    
-                } catch (error) {
-                    console.warn(`Failed to load from ${urls[i]}:`, error.message);
-                    
-                    if (i === urls.length - 1) {
-                        // Last URL failed
-                        infoDiv.innerHTML = `
-                            <strong>Error loading data:</strong><br>
-                            • plot-data.tsv: Not found<br>
-                            • Remote URL: ${error.message}<br><br>
-                            Please ensure the TSV file is available.
-                        `;
-                        document.getElementById('legend').innerHTML = '<div class="loading">Failed to load data</div>';
-                    }
-                }
-            }
-        }
         
-        function updateLegend() {
-            const legend = document.getElementById('legend');
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
-            
-            legend.innerHTML = uniqueFactors.map((factor, i) => {
-                const count = data.filter(d => d.Factor === factor).length;
-                return `
-                    <div class="legend-item">
-                        <div class="color-box" style="background: ${colors[i % colors.length]};"></div>
-                        <span>${factor} (${count})</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function createAxes() {
-            const axesGroup = new THREE.Group();
-            const axisLength = 6;
-            
-            // X-axis (red)
-            const xGeometry = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(0, 0, 0), new THREE.Vector3(axisLength, 0, 0)
-            ]);
-            const xAxis = new THREE.Line(xGeometry, new THREE.LineBasicMaterial({ color: 0xff4444 }));
-            axesGroup.add(xAxis);
-            
-            // Y-axis (green)
-            const yGeometry = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, axisLength, 0)
-            ]);
-            const yAxis = new THREE.Line(yGeometry, new THREE.LineBasicMaterial({ color: 0x44ff44 }));
-            axesGroup.add(yAxis);
-            
-            // Z-axis (blue)
-            const zGeometry = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, axisLength)
-            ]);
-            const zAxis = new THREE.Line(zGeometry, new THREE.LineBasicMaterial({ color: 0x4444ff }));
-            axesGroup.add(zAxis);
-            
-            return axesGroup;
-        }
-
-        function createDataPoints() {
-            const pointsGroup = new THREE.Group();
-            spheres = [];
-
-            data.forEach((point) => {
-                const geometry = new THREE.SphereGeometry(0.12, 16, 16);
-                const material = new THREE.MeshLambertMaterial({ 
-                    color: colorMap[point.Factor],
-                    transparent: true,
-                    opacity: 0.85
+        // Load TSV with fallback
+        function loadData() {
+            fetch('plot-data.tsv')
+                .then(response => response.text())
+                .then(text => {
+                    // Simple TSV parsing
+                    const lines = text.trim().split('\n');
+                    const headers = lines[0].split('\t');
+                    data = lines.slice(1).map(line => {
+                        const values = line.split('\t');
+                        return {
+                            Variable: values[0],
+                            Dim1: parseFloat(values[1]),
+                            Dim2: parseFloat(values[2]),
+                            Dim3: parseFloat(values[3]),
+                            Factor: values[4]
+                        };
+                    });
+                    console.log('Loaded TSV data');
+                    initVisualization();
+                })
+                .catch(() => {
+                    data = fallbackData;
+                    console.log('Using fallback data');
+                    initVisualization();
                 });
-                
-                const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.set(point.Dim1, point.Dim2, point.Dim3);
-                sphere.userData = { variable: point.Variable, factor: point.Factor };
-                
-                pointsGroup.add(sphere);
-                spheres.push(sphere);
-            });
-
-            scene.add(pointsGroup);
         }
 
-        function initScene() {
-            // Scene setup
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x2a2a2a);
-            
-            const container = document.getElementById('container');
-            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            
-            const container = document.getElementById('container');
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            
-            // Clear any existing canvas
-            const existingCanvas = container.querySelector('canvas');
-            if (existingCanvas) {
-                existingCanvas.remove();
-            }
-            
-            container.appendChild(renderer.domElement);
+        function initVisualization() {
 
-            // Create axes and data points
-            scene.add(createAxes());
-            createDataPoints();
+        // Colors for factors
+        const colors = {
+            "Language": 0xff6b6b,
+            "Motor": 0x4ecdc4,
+            "VizSpat_Math": 0x45b7d1,
+            "Attention": 0xf7d794,
+            "Social": 0xc44569,
+            "Orphan": 0xa55eea
+        };
 
-            // Set up camera
-            camera.position.set(5, 5, 5);
-            camera.lookAt(0, 0, 0);
+        // Setup
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2a2a2a);
+        
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
 
-            // Set up controls
-            setupControls();
+        // Create axes
+        const axisLength = 6;
+        const xAxis = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(axisLength,0,0)]);
+        const yAxis = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,axisLength,0)]);
+        const zAxis = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,axisLength)]);
+        
+        scene.add(new THREE.Line(xAxis, new THREE.LineBasicMaterial({ color: 0xff4444 })));
+        scene.add(new THREE.Line(yAxis, new THREE.LineBasicMaterial({ color: 0x44ff44 })));
+        scene.add(new THREE.Line(zAxis, new THREE.LineBasicMaterial({ color: 0x4444ff })));
 
-            // Set up lighting
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
-            
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(1, 1, 1);
-            scene.add(directionalLight);
+        // Create data points
+        const spheres = [];
+        data.forEach(point => {
+            const geometry = new THREE.SphereGeometry(0.12, 16, 16);
+            const material = new THREE.MeshLambertMaterial({ color: colors[point.Factor], opacity: 0.85, transparent: true });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.set(point.Dim1, point.Dim2, point.Dim3);
+            sphere.userData = { variable: point.Variable, factor: point.Factor };
+            scene.add(sphere);
+            spheres.push(sphere);
+        });
 
-            // Update info
-            infoDiv.innerHTML = `
-                <strong>Controls:</strong><br>
-                • Touch + drag: Rotate<br>
-                • Pinch: Zoom in/out<br>
-                • Tap: View details
-            `;
+        // Camera controls
+        let isDown = false;
+        let mouseX = 0, mouseY = 0;
+        let rotX = Math.PI * 0.1, rotY = Math.PI * 0.25; // Start with nice angle
+        let distance = 10;
+        let lastTouch = 0;
 
-            // Start animation
-            animate();
+        camera.position.set(5, 5, 5);
+        camera.lookAt(0, 0, 0);
 
-            // Handle window resize
-            window.addEventListener('resize', () => {
-                const container = document.getElementById('container');
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
-        }
-
-        function getInputCoords(event) {
-            if (event.touches && event.touches.length > 0) {
-                return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-            }
-            return { x: event.clientX, y: event.clientY };
-        }
-
-        function getTouchDistance(event) {
-            if (event.touches.length === 2) {
-                const dx = event.touches[0].clientX - event.touches[1].clientX;
-                const dy = event.touches[0].clientY - event.touches[1].clientY;
-                return Math.sqrt(dx * dx + dy * dy);
-            }
-            return 0;
-        }
-
-        function onPointerStart(event) {
-            event.preventDefault();
-            isInteracting = true;
-            const coords = getInputCoords(event);
-            mouseX = coords.x;
-            mouseY = coords.y;
-            
-            if (event.touches && event.touches.length === 2) {
-                lastTouchDistance = getTouchDistance(event);
-            }
-        }
-
-        function onPointerMove(event) {
-            if (!isInteracting) return;
-            event.preventDefault();
-            
-            if (event.touches && event.touches.length === 2) {
-                const touchDistance = getTouchDistance(event);
-                if (lastTouchDistance > 0) {
-                    const scale = touchDistance / lastTouchDistance;
-                    cameraDistance /= scale;
-                    cameraDistance = Math.max(3, Math.min(20, cameraDistance));
-                }
-                lastTouchDistance = touchDistance;
-            } else {
-                const coords = getInputCoords(event);
-                const deltaX = coords.x - mouseX;
-                const deltaY = coords.y - mouseY;
-                
-                // Reverse the rotation direction for more natural feel
-                rotationY -= deltaX * 0.01;
-                rotationX -= deltaY * 0.01;
-                rotationX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotationX));
-                
-                mouseX = coords.x;
-                mouseY = coords.y;
-            }
-            
-            updateCameraPosition();
-        }
-
-        function onPointerEnd(event) {
-            isInteracting = false;
-            lastTouchDistance = 0;
-        }
-
-        function updateCameraPosition() {
-            const x = cameraDistance * Math.sin(rotationY) * Math.cos(rotationX);
-            const y = cameraDistance * Math.sin(rotationX);
-            const z = cameraDistance * Math.cos(rotationY) * Math.cos(rotationX);
-            
+        function updateCamera() {
+            const x = distance * Math.sin(rotY) * Math.cos(rotX);
+            const y = distance * Math.sin(rotX);
+            const z = distance * Math.cos(rotY) * Math.cos(rotX);
             camera.position.set(x, y, z);
             camera.lookAt(0, 0, 0);
         }
 
-        function setupControls() {
-            // Event listeners
-            renderer.domElement.addEventListener('mousedown', onPointerStart, { passive: false });
-            renderer.domElement.addEventListener('touchstart', onPointerStart, { passive: false });
-            renderer.domElement.addEventListener('mousemove', onPointerMove, { passive: false });
-            renderer.domElement.addEventListener('touchmove', onPointerMove, { passive: false });
-            renderer.domElement.addEventListener('mouseup', onPointerEnd);
-            renderer.domElement.addEventListener('touchend', onPointerEnd);
-            renderer.domElement.addEventListener('touchcancel', onPointerEnd);
-
-            renderer.domElement.addEventListener('wheel', (event) => {
-                event.preventDefault();
-                cameraDistance += event.deltaY * 0.01;
-                cameraDistance = Math.max(3, Math.min(20, cameraDistance));
-                updateCameraPosition();
-            }, { passive: false });
-
-            // Interaction detection
-            renderer.domElement.addEventListener('click', onTap);
-            renderer.domElement.addEventListener('touchend', (event) => {
-                if (event.touches.length === 0 && !isInteracting) {
-                    onTap(event);
-                }
-            });
+        function onStart(e) {
+            e.preventDefault();
+            isDown = true;
+            const coords = e.touches ? e.touches[0] : e;
+            mouseX = coords.clientX;
+            mouseY = coords.clientY;
+            if (e.touches && e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastTouch = Math.sqrt(dx*dx + dy*dy);
+            }
         }
 
-        function onTap(event) {
-            if (isInteracting || !spheres.length) return;
+        function onMove(e) {
+            if (!isDown) return;
+            e.preventDefault();
             
-            const rect = renderer.domElement.getBoundingClientRect();
-            let clientX, clientY;
-            
-            if (event.touches && event.touches.length > 0) {
-                clientX = event.touches[0].clientX;
-                clientY = event.touches[0].clientY;
+            if (e.touches && e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const touchDist = Math.sqrt(dx*dx + dy*dy);
+                if (lastTouch > 0) {
+                    distance /= (touchDist / lastTouch);
+                    distance = Math.max(3, Math.min(20, distance));
+                }
+                lastTouch = touchDist;
             } else {
-                clientX = event.clientX;
-                clientY = event.clientY;
+                const coords = e.touches ? e.touches[0] : e;
+                const deltaX = coords.clientX - mouseX;
+                const deltaY = coords.clientY - mouseY;
+                rotY -= deltaX * 0.01;
+                rotX -= deltaY * 0.01;
+                rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX));
+                mouseX = coords.clientX;
+                mouseY = coords.clientY;
             }
-            
-            mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+            updateCamera();
+        }
+
+        function onEnd() {
+            isDown = false;
+            lastTouch = 0;
+        }
+
+        // Events
+        renderer.domElement.addEventListener('mousedown', onStart);
+        renderer.domElement.addEventListener('touchstart', onStart);
+        renderer.domElement.addEventListener('mousemove', onMove);
+        renderer.domElement.addEventListener('touchmove', onMove);
+        renderer.domElement.addEventListener('mouseup', onEnd);
+        renderer.domElement.addEventListener('touchend', onEnd);
+
+        renderer.domElement.addEventListener('wheel', e => {
+            e.preventDefault();
+            distance += e.deltaY * 0.01;
+            distance = Math.max(3, Math.min(20, distance));
+            updateCamera();
+        });
+
+        // Selection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let selected = null;
+
+        function onTap(e) {
+            if (isDown) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const coords = e.touches ? e.touches[0] : e;
+            mouse.x = ((coords.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((coords.clientY - rect.top) / rect.height) * 2 + 1;
             
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(spheres);
+            const hits = raycaster.intersectObjects(spheres);
             
-            if (intersects.length > 0) {
-                const object = intersects[0].object;
-                
-                // Reset previous selection
-                if (selectedObject) {
-                    selectedObject.scale.set(1, 1, 1);
-                }
-                
-                // Select new object
-                selectedObject = object;
-                object.scale.set(1.6, 1.6, 1.6);
-                
-                infoDiv.innerHTML = `
-                    <strong>${object.userData.variable}</strong><br>
-                    <strong>Factor:</strong> ${object.userData.factor}<br>
-                    <strong>Coords:</strong><br>(${object.position.x.toFixed(2)}, ${object.position.y.toFixed(2)}, ${object.position.z.toFixed(2)})<br><br>
-                    <strong>Controls:</strong><br>
-                    • Touch + drag: Rotate<br>
-                    • Pinch: Zoom<br>
-                    • Tap: Select point
+            if (selected) selected.scale.set(1, 1, 1);
+            
+            if (hits.length > 0) {
+                selected = hits[0].object;
+                selected.scale.set(1.6, 1.6, 1.6);
+                document.getElementById('info').innerHTML = `
+                    <strong>${selected.userData.variable}</strong><br>
+                    Factor: ${selected.userData.factor}<br>
+                    Coords: (${selected.position.x.toFixed(2)}, ${selected.position.y.toFixed(2)}, ${selected.position.z.toFixed(2)})
                 `;
             } else {
-                if (selectedObject) {
-                    selectedObject.scale.set(1, 1, 1);
-                    selectedObject = null;
-                    
-                    infoDiv.innerHTML = `
-                        <strong>Controls:</strong><br>
-                        • Touch + drag: Rotate<br>
-                        • Pinch: Zoom in/out<br>
-                        • Tap: View details
-                    `;
-                }
+                selected = null;
+                document.getElementById('info').innerHTML = `
+                    <strong>Controls:</strong><br>
+                    • Drag: Rotate<br>
+                    • Scroll/Pinch: Zoom<br>
+                    • Tap: Select point
+                `;
             }
         }
 
-        // Animation loop
+        renderer.domElement.addEventListener('click', onTap);
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0x404040, 0.6));
+        const light = new THREE.DirectionalLight(0xffffff, 0.8);
+        light.position.set(1, 1, 1);
+        scene.add(light);
+
+        // Render loop
         function animate() {
-            if (!scene || !camera || !renderer) return;
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
 
-        // Start loading data when page loads
-        window.addEventListener('load', loadData);
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        animate();
+        }
+
+        // Start loading
+        loadData();
     </script>
 </body>
 </html>
