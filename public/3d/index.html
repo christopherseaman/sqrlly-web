@@ -16,6 +16,7 @@
             touch-action: none;
         }
 
+```
     @media (max-width: 768px) {
         body { padding: 5px; }
     }
@@ -103,6 +104,14 @@
         font-size: 14px;
         color: #e0e0e0;
     }
+    
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        font-size: 18px;
+    }
 </style>
 ```
 
@@ -113,38 +122,13 @@
 ```
 <div id="container">
     <div id="info">
-        <strong>Controls:</strong><br>
-        • Touch + drag: Rotate<br>
-        • Pinch: Zoom in/out<br>
-        • Tap: View details
+        <strong>Loading data...</strong><br>
+        Trying plot-data.tsv
     </div>
 </div>
 
-<div class="legend">
-    <div class="legend-item">
-        <div class="color-box" style="background: #ff6b6b;"></div>
-        <span>Language (4)</span>
-    </div>
-    <div class="legend-item">
-        <div class="color-box" style="background: #4ecdc4;"></div>
-        <span>Motor (6)</span>
-    </div>
-    <div class="legend-item">
-        <div class="color-box" style="background: #45b7d1;"></div>
-        <span>VizSpat_Math (4)</span>
-    </div>
-    <div class="legend-item">
-        <div class="color-box" style="background: #f7d794;"></div>
-        <span>Attention (3)</span>
-    </div>
-    <div class="legend-item">
-        <div class="color-box" style="background: #c44569;"></div>
-        <span>Social (2)</span>
-    </div>
-    <div class="legend-item">
-        <div class="color-box" style="background: #a55eea;"></div>
-        <span>Orphan (2)</span>
-    </div>
+<div class="legend" id="legend">
+    <div class="loading">Loading data...</div>
 </div>
 
 <div id="controls">
@@ -154,72 +138,94 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script>
-    // Data loading and parsing
+    // Global variables
     let data = [];
     let colorMap = {};
     let uniqueFactors = [];
-    
-    // Scene setup (will be called after data loads)
     let scene, camera, renderer, spheres = [];
     let isInteracting = false;
     let mouseX = 0, mouseY = 0;
     let rotationX = 0, rotationY = 0;
     let cameraDistance = 10;
     let lastTouchDistance = 0;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let selectedObject = null;
+    const infoDiv = document.getElementById('info');
 
     // Load data from TSV file
     async function loadData() {
-        try {
-            // Try relative path first, then absolute URL
-            let response;
+        const urls = [
+            'plot-data.tsv',
+            'http://dl.badmath.org/3d/plot-data.tsv'
+        ];
+        
+        for (let i = 0; i < urls.length; i++) {
             try {
-                response = await fetch('plot-data.tsv');
-                if (!response.ok) throw new Error('Local file not found');
-            } catch (e) {
-                response = await fetch('http://dl.badmath.org/3d/plot-data.tsv');
+                infoDiv.innerHTML = `<strong>Loading data...</strong><br>Trying: ${urls[i]}`;
+                
+                const response = await fetch(urls[i]);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const tsvText = await response.text();
+                
+                // Parse TSV using PapaParse
+                const parsed = Papa.parse(tsvText, {
+                    header: true,
+                    delimiter: '\t',
+                    dynamicTyping: true,
+                    skipEmptyLines: true
+                });
+                
+                if (parsed.errors.length > 0) {
+                    throw new Error(`Parse errors: ${parsed.errors[0].message}`);
+                }
+                
+                data = parsed.data.filter(row => row.Variable && row.Factor); // Remove empty rows
+                
+                if (data.length === 0) {
+                    throw new Error('No valid data found in file');
+                }
+                
+                // Extract unique factors and create color mapping
+                uniqueFactors = [...new Set(data.map(d => d.Factor))];
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
+                
+                colorMap = {};
+                uniqueFactors.forEach((factor, index) => {
+                    colorMap[factor] = parseInt(colors[index % colors.length].replace('#', '0x'));
+                });
+                
+                // Update legend
+                updateLegend();
+                
+                // Initialize 3D scene
+                initScene();
+                
+                console.log(`Successfully loaded ${data.length} data points with factors:`, uniqueFactors);
+                return; // Success - exit the function
+                
+            } catch (error) {
+                console.warn(`Failed to load from ${urls[i]}:`, error.message);
+                
+                if (i === urls.length - 1) {
+                    // Last URL failed
+                    infoDiv.innerHTML = `
+                        <strong>Error loading data:</strong><br>
+                        • plot-data.tsv: Not found<br>
+                        • Remote URL: ${error.message}<br><br>
+                        Please ensure the TSV file is available.
+                    `;
+                    document.getElementById('legend').innerHTML = '<div class="loading">Failed to load data</div>';
+                }
             }
-            
-            const tsvText = await response.text();
-            
-            // Parse TSV using PapaParse
-            const parsed = Papa.parse(tsvText, {
-                header: true,
-                delimiter: '\t',
-                dynamicTyping: true,
-                skipEmptyLines: true
-            });
-            
-            data = parsed.data;
-            
-            // Extract unique factors and create color mapping
-            uniqueFactors = [...new Set(data.map(d => d.Factor))];
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
-            
-            colorMap = {};
-            uniqueFactors.forEach((factor, i) => {
-                colorMap[factor] = parseInt(colors[i % colors.length].replace('#', '0x'));
-            });
-            
-            // Update legend
-            updateLegend();
-            
-            // Initialize 3D scene
-            initScene();
-            
-            console.log(`Loaded ${data.length} data points with factors:`, uniqueFactors);
-            
-        } catch (error) {
-            console.error('Error loading data:', error);
-            document.getElementById('info').innerHTML = `
-                <strong>Error loading data:</strong><br>
-                ${error.message}<br><br>
-                Please ensure plot-data.tsv is available.
-            `;
         }
     }
     
     function updateLegend() {
-        const legend = document.querySelector('.legend');
+        const legend = document.getElementById('legend');
         const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7d794', '#c44569', '#a55eea', '#26de81', '#fd9644'];
         
         legend.innerHTML = uniqueFactors.map((factor, i) => {
@@ -233,52 +239,6 @@
         }).join('');
     }
 
-    function initScene() {
-        // Scene setup
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x2a2a2a);
-        
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        
-        const container = document.getElementById('container');
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        // Create axes
-        scene.add(createAxes());
-
-        // Create data points
-        createDataPoints();
-
-        // Set up camera
-        camera.position.set(5, 5, 5);
-        camera.lookAt(0, 0, 0);
-
-        // Set up controls
-        setupControls();
-
-        // Set up lighting
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-        scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 1);
-        scene.add(directionalLight);
-
-        // Start animation
-        animate();
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            const container = document.getElementById('container');
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-    }
-
-    // Create axes
     function createAxes() {
         const axesGroup = new THREE.Group();
         const axisLength = 6;
@@ -307,8 +267,6 @@
         return axesGroup;
     }
 
-    scene.add(createAxes());
-
     function createDataPoints() {
         const pointsGroup = new THREE.Group();
         spheres = [];
@@ -332,10 +290,63 @@
         scene.add(pointsGroup);
     }
 
-    function setupControls() {
-        // Camera controls with mobile support
+    function initScene() {
+        // Scene setup
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x2a2a2a);
+        
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        const container = document.getElementById('container');
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        
+        // Clear any existing canvas
+        const existingCanvas = container.querySelector('canvas');
+        if (existingCanvas) {
+            existingCanvas.remove();
+        }
+        
+        container.appendChild(renderer.domElement);
+
+        // Create axes and data points
+        scene.add(createAxes());
+        createDataPoints();
+
+        // Set up camera
         camera.position.set(5, 5, 5);
         camera.lookAt(0, 0, 0);
+
+        // Set up controls
+        setupControls();
+
+        // Set up lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        // Update info
+        infoDiv.innerHTML = `
+            <strong>Controls:</strong><br>
+            • Touch + drag: Rotate<br>
+            • Pinch: Zoom in/out<br>
+            • Tap: View details
+        `;
+
+        // Start animation
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    }
 
     function getInputCoords(event) {
         if (event.touches && event.touches.length > 0) {
@@ -407,6 +418,7 @@
         camera.lookAt(0, 0, 0);
     }
 
+    function setupControls() {
         // Event listeners
         renderer.domElement.addEventListener('mousedown', onPointerStart, { passive: false });
         renderer.domElement.addEventListener('touchstart', onPointerStart, { passive: false });
@@ -432,6 +444,62 @@
         });
     }
 
+    function onTap(event) {
+        if (isInteracting || !spheres.length) return;
+        
+        const rect = renderer.domElement.getBoundingClientRect();
+        let clientX, clientY;
+        
+        if (event.touches && event.touches.length > 0) {
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        } else {
+            clientX = event.clientX;
+            clientY = event.clientY;
+        }
+        
+        mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+        
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(spheres);
+        
+        if (intersects.length > 0) {
+            const object = intersects[0].object;
+            
+            // Reset previous selection
+            if (selectedObject) {
+                selectedObject.scale.set(1, 1, 1);
+            }
+            
+            // Select new object
+            selectedObject = object;
+            object.scale.set(1.6, 1.6, 1.6);
+            
+            infoDiv.innerHTML = `
+                <strong>${object.userData.variable}</strong><br>
+                <strong>Factor:</strong> ${object.userData.factor}<br>
+                <strong>Coords:</strong><br>(${object.position.x.toFixed(2)}, ${object.position.y.toFixed(2)}, ${object.position.z.toFixed(2)})<br><br>
+                <strong>Controls:</strong><br>
+                • Touch + drag: Rotate<br>
+                • Pinch: Zoom<br>
+                • Tap: Select point
+            `;
+        } else {
+            if (selectedObject) {
+                selectedObject.scale.set(1, 1, 1);
+                selectedObject = null;
+                
+                infoDiv.innerHTML = `
+                    <strong>Controls:</strong><br>
+                    • Touch + drag: Rotate<br>
+                    • Pinch: Zoom in/out<br>
+                    • Tap: View details
+                `;
+            }
+        }
+    }
+
     // Animation loop
     function animate() {
         if (!scene || !camera || !renderer) return;
@@ -442,6 +510,7 @@
     // Start loading data when page loads
     window.addEventListener('load', loadData);
 </script>
+```
 
 </body>
 </html>
