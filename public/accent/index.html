@@ -223,13 +223,65 @@
             backdrop-filter: blur(10px);
         }
         
-        /* 6 perfectly curated purples with fun names */
+        .section-header {
+            text-align: center;
+            margin: 40px 0 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .section-subtitle {
+            margin: 8px 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .spectrum-bar {
+            height: 40px;
+            background: linear-gradient(to right, 
+                #bcc7e8 0%, 
+                #a8b5f0 20%, 
+                #c6b3dc 40%, 
+                #b49fdf 60%, 
+                #8fa6ea 80%, 
+                #7a8eeb 100%);
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        /* Original 6 purples */
         .misty-periwinkle { background: linear-gradient(135deg, #bcc7e8 0%, #c8d3f0 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
         .cloud-nine { background: linear-gradient(135deg, #a8b5f0 0%, #b4c1f6 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
         .twilight-mist { background: linear-gradient(135deg, #c6b3dc 0%, #d2c0e8 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
         .amethyst-whisper { background: linear-gradient(135deg, #b49fdf 0%, #c0aae5 100%); color: #333 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important; }
         .digital-dreams { background: linear-gradient(135deg, #8fa6ea 0%, #9bb2f0 100%); }
         .cosmic-gradient { background: linear-gradient(135deg, #7a8eeb 0%, #8c65b8 100%); }
+        
+        /* Palatable blurples */
+        .blurple-light { background: linear-gradient(135deg, #8fa3f3 0%, #a5b7f7 100%); }
+        .blurple-gray { background: linear-gradient(135deg, #7c8db8 0%, #8899c4 100%); }
+        .blurple-warm { background: linear-gradient(135deg, #8a7fb8 0%, #968bb4 100%); }
+        .blurple-soft { background: linear-gradient(135deg, #9bb0e3 0%, #a7bce9 100%); }
+        .blurple-dusty { background: linear-gradient(135deg, #7a84a8 0%, #8690b4 100%); }
+        .blurple-original { background: linear-gradient(135deg, #5539cc 0%, #6b4fd1 100%); }
         
         .simply-white { 
             background: linear-gradient(135deg, #faf9f7 0%, #f8f7f5 100%); 
@@ -253,29 +305,6 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 20px;
-        }
-        
-        .spectrum-bar {
-            height: 40px;
-            background: linear-gradient(to right, 
-                #bcc7e8 0%, 
-                #a8b5f0 20%, 
-                #c6b3dc 40%, 
-                #b49fdf 60%, 
-                #8fa6ea 80%, 
-                #7a8eeb 100%);
-            border-radius: 20px;
-            margin: 20px 0;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .spectrum-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-            margin-top: 8px;
         }
         
         .rec-grid {
@@ -402,11 +431,11 @@
                         <div class="color-swatch twilight-mist">Twilight Mist</div>
                     </div>
                 </div>
-                <div class="intensity-indicator">Sophisticated</div>
+                <div class="intensity-indicator">Your Pick</div>
                 <div class="color-info">
                     <div class="color-name">Twilight Mist</div>
                     <div class="color-code">#c6b3dc</div>
-                    <div class="description">Sophisticated: Elegant twilight purple - more purple than Cloud Nine, beautifully refined and sophisticated.</div>
+                    <div class="description">YOUR CHOICE: Elegant twilight purple - more purple than Cloud Nine, beautifully refined and sophisticated.</div>
                 </div>
             </div>
             
@@ -461,6 +490,121 @@
                     <div class="color-name">Cosmic Gradient</div>
                     <div class="color-code">#7a8eeb → #8c65b8</div>
                     <div class="description">Your original MacOS purple gradient - cosmic and bold. The full realization of your purple vision.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-header">
+            <h3 class="section-title">Palatable Blurples</h3>
+            <p class="section-subtitle">Making Discord's blurple work with warm cherry wood</p>
+        </div>
+        
+        <div class="color-grid">
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-light">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-light">Light Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Safest</div>
+                <div class="color-info">
+                    <div class="color-name">Light Blurple</div>
+                    <div class="color-code">#8fa3f3</div>
+                    <div class="description">Lighter version - less intense, more approachable.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-gray">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-gray">Gray Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Sophisticated</div>
+                <div class="color-info">
+                    <div class="color-name">Gray Blurple</div>
+                    <div class="color-code">#7c8db8</div>
+                    <div class="description">Gray undertones make it more neutral and sophisticated.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-warm">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-warm">Warm Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Harmonious</div>
+                <div class="color-info">
+                    <div class="color-name">Warm Blurple</div>
+                    <div class="color-code">#8a7fb8</div>
+                    <div class="description">Warmer undertones bridge with cherry's warmth.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-soft">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-soft">Soft Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Gentle</div>
+                <div class="color-info">
+                    <div class="color-name">Soft Blurple</div>
+                    <div class="color-code">#9bb0e3</div>
+                    <div class="description">Very light and soft - barely there blurple.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-dusty">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-dusty">Dusty Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Muted</div>
+                <div class="color-info">
+                    <div class="color-name">Dusty Blurple</div>
+                    <div class="color-code">#7a84a8</div>
+                    <div class="description">Dusty and muted - sophisticated without being bold.</div>
+                </div>
+            </div>
+            
+            <div class="color-option">
+                <img src="https://cdn.prod.website-files.com/682b44efbb66c2fcc6b92d2b/684bd8d195ec25aada7042db_BRAZILIAN-CHERRY-LA-PAZ.jpeg" alt="Brazilian Cherry" class="flooring-background brazilian-cherry">
+                <img src="https://www.greenbuildingsupply.com/cdn/shop/files/Kahrs-World-Jatoba-LaPaz-8807-SW-LG_skus8807.jpg" alt="Jatoba" class="flooring-background jatoba hidden">
+                <div class="color-overlay">
+                    <div class="wall-preview blurple-original">ACCENT WALL</div>
+                    <div class="color-swatches">
+                        <div class="color-swatch simply-white">Simply White</div>
+                        <div class="color-swatch blurple-original">OG Blurple</div>
+                    </div>
+                </div>
+                <div class="intensity-indicator">Bold</div>
+                <div class="color-info">
+                    <div class="color-name">Original Blurple</div>
+                    <div class="color-code">#5539cc</div>
+                    <div class="description">The real Discord blurple - bold and unapologetic against cherry.</div>
                 </div>
             </div>
         </div>
